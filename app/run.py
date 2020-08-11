@@ -1,14 +1,17 @@
 import json
 import plotly
 import pandas as pd
+import numpy as np
 
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
 
 from flask import Flask
-from flask import render_template, request, jsonify
+from flask import render_template, request
 from plotly.graph_objs import Bar
-from sklearn.externals import joblib
+import joblib
+
+#from sklearn.externals import joblib
 from sqlalchemy import create_engine
 
 
@@ -26,31 +29,40 @@ def tokenize(text):
     return clean_tokens
 
 # load data
-engine = create_engine('sqlite:///../data/YourDatabaseName.db')
-df = pd.read_sql_table('YourTableName', engine)
+engine = create_engine('sqlite:///C:/Users/Clemens/Documents/DisasterResponsePipeline/data/DisasterResponse.db')
+df = pd.read_sql_table('DisasterResponse', engine)
 
 # load model
-model = joblib.load("../models/your_model_name.pkl")
+model = joblib.load("C:/Users/Clemens/Documents/DisasterResponsePipeline/models/classifier.pkl")
 
-
-# index webpage displays cool visuals and receives user input text for model
+# requested graphs
 @app.route('/')
 @app.route('/index')
 def index():
     
     # extract data needed for visuals
-    # TODO: Below is an example - modify to extract data for your own visuals
     genre_counts = df.groupby('genre').count()['message']
     genre_names = list(genre_counts.index)
     
+    category_names = df.iloc[:, 4:].columns
+    category_boolean = (df.iloc[:, 4:] != 0).sum().values
+    
+    category = list(df.columns[4:])
+    category_counts = []
+    for column_name in category:
+        category_counts.append(np.sum(df[column_name]))
+        
+    categories = df.iloc[:,4:]
+    categories_mean = categories.mean().sort_values(ascending=False)[1:11]
+    categories_names = list(categories_mean.index)
+    
     # create visuals
-    # TODO: Below is an example - modify to create your own visuals
     graphs = [
         {
             'data': [
                 Bar(
-                    x=genre_names,
-                    y=genre_counts
+                    x = genre_names,
+                    y = genre_counts
                 )
             ],
 
@@ -63,15 +75,55 @@ def index():
                     'title': "Genre"
                 }
             }
+        },             # graph of the total count of the message categories
+        {
+            'data': [
+                Bar(
+                    x = category_names,
+                    y = category_boolean
+                )
+            ],
+
+            'layout': {
+                'title': 'Distribution of Message Categories',
+                'yaxis': {
+                    'title': "Count",
+                    'automargin': True
+                },
+                'xaxis': {
+                    'title': "Category",
+                    'tickangle': 35,
+                    'automargin': True
+                }
+            }
+        },
+                # graph of the top 10  message categories
+        {
+            'data': [
+                Bar(
+                    x = categories_names,
+                    y = categories_mean
+                )
+            ],
+
+            'layout': {
+                'title': 'Top 10 Message Categories',
+                'yaxis': {
+                    'title': "Percentage"
+                },
+                'xaxis': {
+                    'title': "Categories"
+                }
+            }
         }
     ]
     
     # encode plotly graphs in JSON
     ids = ["graph-{}".format(i) for i, _ in enumerate(graphs)]
-    graphJSON = json.dumps(graphs, cls=plotly.utils.PlotlyJSONEncoder)
+    graphJSON = json.dumps(graphs, cls = plotly.utils.PlotlyJSONEncoder)
     
     # render web page with plotly graphs
-    return render_template('master.html', ids=ids, graphJSON=graphJSON)
+    return render_template('master.html', ids = ids, graphJSON = graphJSON)
 
 
 # web page that handles user query and displays model results
@@ -87,8 +139,8 @@ def go():
     # This will render the go.html Please see that file. 
     return render_template(
         'go.html',
-        query=query,
-        classification_result=classification_results
+        query = query,
+        classification_result = classification_results
     )
 
 
@@ -98,3 +150,13 @@ def main():
 
 if __name__ == '__main__':
     main()
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    

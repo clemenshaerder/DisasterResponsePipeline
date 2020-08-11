@@ -3,3 +3,6 @@ python C:/Users/Clemens/Documents/DisasterResponsePipeline/data/process_data.py 
 
 Model Trainer:
 python C:/Users/Clemens/Documents/DisasterResponsePipeline/models/train_classifier.py C:/Users/Clemens/Documents/DisasterResponsePipeline/data/DisasterResponse.db C:/Users/Clemens/Documents/DisasterResponsePipeline/models/classifier.pkl
+
+run:
+python C:/Users/Clemens/Documents/DisasterResponsePipeline/app/run.py
