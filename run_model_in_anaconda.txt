@@ -1,0 +1,5 @@
+ETL:
+python C:/Users/Clemens/Documents/DisasterResponsePipeline/data/process_data.py C:/Users/Clemens/Documents/DisasterResponsePipeline/data/disaster_messages.csv C:/Users/Clemens/Documents/DisasterResponsePipeline/data/disaster_categories.csv C:/Users/Clemens/Documents/DisasterResponsePipeline/data/DisasterResponse.db
+
+Model Trainer:
+python C:/Users/Clemens/Documents/DisasterResponsePipeline/models/train_classifier.py C:/Users/Clemens/Documents/DisasterResponsePipeline/data/DisasterResponse.db C:/Users/Clemens/Documents/DisasterResponsePipeline/models/classifier.pkl
